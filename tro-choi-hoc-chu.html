@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trò Chơi Học Chữ a, ă, â – Cô Giáo Dạy Bé</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background-image: url('https://cdn.pixabay.com/photo/2017/08/30/07/51/children-2696385_1280.jpg');
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    button { transition: all 0.2s ease; }
+    button:active { transform: scale(0.9); }
+
+    #chuCard {
+      background-image: url('https://cdn.pixabay.com/photo/2017/04/04/17/51/watercolor-2201160_1280.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    #tuCard {
+      background-image: url('https://cdn.pixabay.com/photo/2016/11/29/05/08/background-1867766_1280.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Hiệu ứng lung linh cho chữ */
+    .shine {
+      animation: shine 2s infinite alternate ease-in-out;
+      text-shadow: 0 0 15px #a5b4fc, 0 0 30px #818cf8, 0 0 45px #6366f1;
+    }
+
+    @keyframes shine {
+      0% { text-shadow: 0 0 5px #a5b4fc, 0 0 15px #818cf8; transform: scale(1); }
+      100% { text-shadow: 0 0 25px #c7d2fe, 0 0 60px #818cf8; transform: scale(1.1); }
+    }
+
+    /* Hiệu ứng bounce chậm và mềm mại */
+    .bounce {
+      animation: bounceIn 1.5s ease-in-out;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.2); opacity: 0; }
+      50% { transform: scale(1.25); opacity: 1; }
+      75% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    /* Màu riêng cho từng chữ cái */
+    .mau-a { color: #ef4444; }      /* Đỏ hồng */
+    .mau-a-ngan { color: #22c55e; } /* Xanh lá */
+    .mau-a-mu { color: #8b5cf6; }   /* Tím xanh */
+
+    /* Pháo hoa */
+    .firework {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #fff, transparent);
+      border-radius: 50%;
+      animation: explode 1.2s ease-out forwards;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(14); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-center p-6">
+
+  <h1 class="text-5xl font-bold text-pink-600 mb-6 animate-bounce drop-shadow-lg">
+    🎵 Trò Chơi Học Chữ a, ă, â 🎵
+  </h1>
+
+  <!-- Màn hình chào -->
+  <div id="introScreen" class="flex flex-col items-center justify-center bg-white/70 p-8 rounded-3xl shadow-xl">
+    <p class="text-2xl text-gray-700 mb-6 italic">
+      Hôm nay cô sẽ ôn lại những con chữ đã học. Các bạn nghe và đoán cùng cô nhé! 💕
+    </p>
+    <button id="btnStart" class="bg-green-400 hover:bg-green-500 text-lg font-bold px-6 py-3 rounded-2xl shadow-md">
+      ▶️ Bắt đầu
+    </button>
+  </div>
+
+  <!-- Màn hình trò chơi -->
+  <div id="gameScreen" class="hidden flex flex-col items-center justify-center bg-white/70 p-6 rounded-3xl shadow-lg">
+    <div class="grid grid-cols-2 gap-10 mb-10">
+      <div id="chuCard" class="w-64 h-64 flex items-center justify-center bg-white shadow-2xl rounded-3xl text-[170px] font-bold lowercase drop-shadow-lg"></div>
+      <div id="tuCard" class="w-80 h-80 flex flex-col items-center justify-center bg-white shadow-2xl rounded-3xl text-green-800 drop-shadow-lg"></div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3">
+      <button id="btnPhatAm" class="bg-yellow-300 hover:bg-yellow-400 text-base font-bold px-4 py-2 rounded-2xl shadow">
+        🔊 Phát âm
+      </button>
+      <button id="btnHienChu" class="bg-pink-300 hover:bg-pink-400 text-base font-bold px-4 py-2 rounded-2xl shadow">
+        ✨ Hiện chữ
+      </button>
+      <button id="btnChoiLai" class="bg-blue-300 hover:bg-blue-400 text-base font-bold px-4 py-2 rounded-2xl shadow">
+        🔁 Chơi lại
+      </button>
+      <button id="btnKetThuc" class="bg-red-400 hover:bg-red-500 text-base font-bold px-4 py-2 rounded-2xl shadow">
+        ⏹ Kết thúc
+      </button>
+    </div>
+
+    <p class="mt-6 text-lg text-gray-700 italic">Cùng cô học chữ a, ă, â nào bé yêu! 💖</p>
+  </div>
+
+  <script>
+    const chuCaiList = [
+      { chu: 'a', tu: 'áo', hinh: 'images/ao.png', am: 'a.mp3', mau: 'mau-a' },
+      { chu: 'ă', tu: 'ăn', hinh: 'images/an.png', am: 'a-ngan.mp3', mau: 'mau-a-ngan' },
+      { chu: 'â', tu: 'ấm nước', hinh: 'images/amnuoc.png', am: 'a-mu.mp3', mau: 'mau-a-mu' }
+    ];
+
+    const amGioiThieu = new Audio('gioi-thieu.mp3');
+    const amHuongDan = new Audio('huong-dan.mp3');
+    const amReset = new Audio('https://cdn.pixabay.com/download/audio/2022/03/15/audio_0285d08f3b.mp3?filename=restart.mp3');
+
+    const introScreen = document.getElementById('introScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const btnStart = document.getElementById('btnStart');
+    const btnPhatAm = document.getElementById('btnPhatAm');
+    const btnHienChu = document.getElementById('btnHienChu');
+    const btnChoiLai = document.getElementById('btnChoiLai');
+    const btnKetThuc = document.getElementById('btnKetThuc');
+    const chuCard = document.getElementById('chuCard');
+    const tuCard = document.getElementById('tuCard');
+
+    let amHienTai = null;
+
+    function taoPhaoHoa() {
+      for (let i = 0; i < 25; i++) {
+        const fw = document.createElement('div');
+        fw.classList.add('firework');
+        fw.style.left = Math.random() * window.innerWidth + 'px';
+        fw.style.top = Math.random() * window.innerHeight + 'px';
+        fw.style.background = `radial-gradient(circle, hsl(${Math.random() * 360}, 100%, 70%), transparent)`;
+        document.body.appendChild(fw);
+        setTimeout(() => fw.remove(), 1200);
+      }
+    }
+
+    function dungTatCaAm() {
+      [amGioiThieu, amHuongDan, amReset].forEach(am => {
+        am.pause();
+        am.currentTime = 0;
+      });
+    }
+
+    btnStart.addEventListener('click', () => {
+      dungTatCaAm();
+      introScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      setTimeout(() => amGioiThieu.play(), 700);
+    });
+
+    btnPhatAm.addEventListener('click', () => {
+      dungTatCaAm();
+      if (!amHienTai) {
+        const random = Math.floor(Math.random() * chuCaiList.length);
+        amHienTai = chuCaiList[random];
+        amHuongDan.play();
+      }
+      const audio = new Audio(amHienTai.am);
+      audio.play();
+    });
+
+    // 🌟 Nút HIỆN CHỮ – chỉ phát âm thanh riêng của cô
+    btnHienChu.addEventListener('click', () => {
+      dungTatCaAm();
+      const amHienChu = new Audio('am-hien-chu.mp3');
+      amHienChu.play();
+
+      if (!amHienTai) return;
+      chuCard.textContent = amHienTai.chu;
+      chuCard.className = `w-64 h-64 flex items-center justify-center bg-white shadow-2xl rounded-3xl text-[170px] font-bold lowercase drop-shadow-lg shine bounce ${amHienTai.mau}`;
+      tuCard.innerHTML = `
+        <img src="${amHienTai.hinh}" alt="${amHienTai.tu}" class="w-40 h-40 mb-2"/>
+        <span class='text-4xl font-semibold capitalize'>${amHienTai.tu}</span>
+      `;
+      taoPhaoHoa();
+    });
+
+    btnChoiLai.addEventListener('click', () => {
+      dungTatCaAm();
+      amReset.play();
+      amHienTai = null;
+      chuCard.textContent = '';
+      tuCard.innerHTML = '';
+      chuCard.className = "w-64 h-64 flex items-center justify-center bg-white shadow-2xl rounded-3xl text-[170px] font-bold lowercase drop-shadow-lg";
+    });
+
+    // ⏹ KẾT THÚC – dừng tất cả, xóa hiệu ứng, quay lại ban đầu
+    btnKetThuc.addEventListener('click', () => {
+      dungTatCaAm();
+      amHienTai = null;
+
+      // Xoá toàn bộ pháo hoa nếu còn
+      document.querySelectorAll('.firework').forEach(f => f.remove());
+
+      // Reset chữ và hình
+      chuCard.textContent = '';
+      tuCard.innerHTML = '';
+      chuCard.className = "w-64 h-64 flex items-center justify-center bg-white shadow-2xl rounded-3xl text-[170px] font-bold lowercase drop-shadow-lg";
+
+      // Ẩn màn chơi, hiện lại màn giới thiệu
+      gameScreen.classList.add('hidden');
+      introScreen.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
